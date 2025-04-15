@@ -10,7 +10,7 @@ services:
   mock-dynatrace-api:
     build: ./mock-dynatrace-api
     ports:
-      - "5000:5000"
+      - "5001:5000"
     container_name: mock-dynatrace-api
 
   oauth-proxy:
