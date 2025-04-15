@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mock-oauth-server:
+    build: ./mock-oauth-server
+    ports:
+      - "3000:3000"
+    container_name: mock-oauth-server
+
+  mock-dynatrace-api:
+    build: ./mock-dynatrace-api
+    ports:
+      - "5000:5000"
+    container_name: mock-dynatrace-api
+
+  oauth-proxy:
+    build: ./oauth-proxy
+    ports:
+      - "4000:4000"
+    container_name: oauth-proxy
+    depends_on:
+      - mock-oauth-server
+      - mock-dynatrace-api
+    environment:
+      - PORT=4000
+      - OAUTH_TOKEN_URL=http://mock-oauth-server:3000/token
+      - CLIENT_ID=test-client
+      - CLIENT_SECRET=super-secret
+      - DYNATRACE_API_BASE=http://mock-dynatrace-api:5000
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3001:3000"
+    container_name: grafana
+    depends_on:
+      - oauth-proxy
+    environment:
+      - GF_INSTALL_PLUGINS=marcusolsson-json-datasource
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:
