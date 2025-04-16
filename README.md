@@ -9,11 +9,12 @@ This is a local dev/test stack for integrating Grafana with a protected API usin
 - **oauth-proxy** – fetches token and proxies requests
 - **grafana** – visualizes metrics using JSON API plugin
 
-## 🚀 Run the stack
+## 🚀 Run the stack - Docker desktop
 
 ```bash
 docker-compose up --build
 ```
+As of 04/16/2025 this was NOT running, as is, in an AWS Linux2 EC2
 
 Grafana: http://localhost:3001  
 OAuth Token URL: http://localhost:3000/token  
