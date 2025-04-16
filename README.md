@@ -9,7 +9,7 @@ This is a local dev/test stack for integrating Grafana with a protected API usin
 - **oauth-proxy** – fetches token and proxies requests
 - **grafana** – visualizes metrics using JSON API plugin
 
-## 🚀 Run the stack - Docker desktop
+## 🚀 Run the stack - Docker desktop 4.37.2
 
 ```bash
 docker-compose up --build
