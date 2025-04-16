@@ -6,12 +6,34 @@ services:
     ports:
       - "3000:3000"
     container_name: mock-oauth-server
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/.well-known/openid-configuration"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
   mock-dynatrace-api:
     build: ./mock-dynatrace-api
     ports:
       - "5001:5000"
     container_name: mock-dynatrace-api
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
   oauth-proxy:
     build: ./oauth-proxy
@@ -19,14 +41,27 @@ services:
       - "4000:4000"
     container_name: oauth-proxy
     depends_on:
-      - mock-oauth-server
-      - mock-dynatrace-api
+      mock-oauth-server:
+        condition: service_healthy
+      mock-dynatrace-api:
+        condition: service_healthy
     environment:
       - PORT=4000
       - OAUTH_TOKEN_URL=http://mock-oauth-server:3000/token
       - CLIENT_ID=test-client
       - CLIENT_SECRET=super-secret
       - DYNATRACE_API_BASE=http://mock-dynatrace-api:5000
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   grafana:
     image: grafana/grafana:10.2.0
@@ -34,11 +69,29 @@ services:
       - "3001:3000"
     container_name: grafana
     depends_on:
-      - oauth-proxy
+      oauth-proxy:
+        condition: service_healthy
     environment:
       - GF_INSTALL_PLUGINS=marcusolsson-json-datasource
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_PROXY_ENABLED=false
+      - GF_LOG_LEVEL=debug
     volumes:
       - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
 volumes:
   grafana-storage:

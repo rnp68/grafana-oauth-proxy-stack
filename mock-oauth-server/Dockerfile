@@ -1,7 +1,9 @@
 FROM node:18-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --production --no-optional
 COPY . .
 EXPOSE 3000
-CMD ["npm", "start"]
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/token || exit 1
+CMD ["node", "--max-old-space-size=64", "--optimize-for-size", "--no-warnings", "index.js"]
