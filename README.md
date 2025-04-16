@@ -24,3 +24,9 @@ Proxy URL: http://localhost:4000/dynatrace/metrics
 
 - URL: `http://oauth-proxy:4000/dynatrace`
 - Query path: `metrics`
+
+FLOW:
+Grafana  -->  OAuth Proxy on EC2  -->  Dynatrace API
+                   |
+           Gets token from
+          OAuth Provider (e.g., Cognito)
