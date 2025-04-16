@@ -14,8 +14,6 @@ This is a local dev/test stack for integrating Grafana with a protected API usin
 ```bash
 docker-compose up --build
 ```
-As of 04/16/2025 this was NOT running, as is, in an AWS Linux2 EC2
-
 Grafana: http://localhost:3001  
 OAuth Token URL: http://localhost:3000/token  
 Dynatrace API: http://localhost:5000/v1/metrics  
