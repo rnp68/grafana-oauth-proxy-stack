@@ -27,8 +27,9 @@ Proxy URL: http://localhost:4000/dynatrace/metrics
 
 FLOW:
 ```bash
-Grafana  -->  OAuth Proxy on EC2  -->  Dynatrace API
+Grafana  -->  OAuth Proxy  -->  Dynatrace API
+                   ^
                    |
-           Gets token from
-          OAuth Provider (e.g., Cognito)
+                   v
+             OAuth Provider
 ```
